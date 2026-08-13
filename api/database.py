@@ -20,12 +20,12 @@ class DBProduct(Base):
     brand = Column(String, nullable=False)
     description = Column(String, nullable=False)
     
-    specifications_json = Column(Text, nullable=False)
-    pricing_json = Column(Text, nullable=False)
-    images_json = Column(Text, nullable=False)
-    source_documents_json = Column(Text, nullable=False)
-    field_confidence_json = Column(Text, nullable=False)
-    enrichment_flags_json = Column(Text, nullable=False)
+    specifications_json = Column(Text, nullable=True)
+    pricing_json = Column(Text, nullable=True)
+    images_json = Column(Text, nullable=True)
+    source_documents_json = Column(Text, nullable=True)
+    field_confidence_json = Column(Text, nullable=True)
+    enrichment_flags_json = Column(Text, nullable=True)
 
     @property
     def specifications(self):
@@ -45,7 +45,7 @@ class DBProduct(Base):
 
     @property
     def images(self):
-        return json.loads(self.images_json) if self.images_json else None
+        return json.loads(self.images_json) if self.images_json else []
 
     @images.setter
     def images(self, value):
@@ -53,7 +53,7 @@ class DBProduct(Base):
 
     @property
     def source_documents(self):
-        return json.loads(self.source_documents_json) if self.source_documents_json else None
+        return json.loads(self.source_documents_json) if self.source_documents_json else []
 
     @source_documents.setter
     def source_documents(self, value):
@@ -61,7 +61,7 @@ class DBProduct(Base):
 
     @property
     def field_confidence(self):
-        return json.loads(self.field_confidence_json) if self.field_confidence_json else None
+        return json.loads(self.field_confidence_json) if self.field_confidence_json else {}
 
     @field_confidence.setter
     def field_confidence(self, value):
@@ -69,7 +69,7 @@ class DBProduct(Base):
 
     @property
     def enrichment_flags(self):
-        return json.loads(self.enrichment_flags_json) if self.enrichment_flags_json else None
+        return json.loads(self.enrichment_flags_json) if self.enrichment_flags_json else []
 
     @enrichment_flags.setter
     def enrichment_flags(self, value):
