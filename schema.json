@@ -1,0 +1,37 @@
+{
+  "product_id": "string",
+  "name": "string",
+  "category": "string",
+  "brand": "string",
+  "description": "string",
+  "specifications": {
+    "dimensions": {
+      "length": "number|null",
+      "width": "number|null",
+      "height": "number|null",
+      "unit": "string|null"
+    },
+    "weight": {
+      "value": "number|null",
+      "unit": "string|null"
+    },
+    "material": "string|null",
+    "color": "string|null",
+    "power_rating": "string|null",
+    "certifications": ["string"]
+  },
+  "pricing": {
+    "value": "number|null",
+    "currency": "string|null"
+  },
+  "images": ["url"],
+  "source_documents": ["string"],
+  "field_confidence": {
+    "<field_name>": {
+      "score": "0-1 float",
+      "source": "string",
+      "reasoning": "string"
+    }
+  },
+  "enrichment_flags": ["string"]
+}

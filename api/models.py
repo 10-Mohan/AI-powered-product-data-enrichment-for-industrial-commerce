@@ -5,11 +5,11 @@ class Dimensions(BaseModel):
     length: Optional[float] = None
     width: Optional[float] = None
     height: Optional[float] = None
-    unit: str
+    unit: Optional[str] = None
 
 class Weight(BaseModel):
     value: Optional[float] = None
-    unit: str
+    unit: Optional[str] = None
 
 class Specifications(BaseModel):
     dimensions: Dimensions
