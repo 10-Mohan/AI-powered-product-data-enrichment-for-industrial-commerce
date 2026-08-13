@@ -6,6 +6,9 @@ import os
 import json
 from pydantic import BaseModel
 from google import genai
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from . import models, database
 
