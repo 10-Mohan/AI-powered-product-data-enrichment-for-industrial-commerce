@@ -10,7 +10,14 @@ if os.path.exists("products.db"):
     os.remove("products.db")
 
 server = subprocess.Popen([sys.executable, "-m", "uvicorn", "api.main:app", "--port", "8000"], cwd=os.getcwd())
-time.sleep(5) 
+
+# Wait for server to be ready
+for _ in range(10):
+    try:
+        if requests.get("http://127.0.0.1:8000/products").status_code == 200:
+            break
+    except requests.exceptions.ConnectionError:
+        time.sleep(1)
 
 try:
     clean_json = {
@@ -56,11 +63,11 @@ try:
           "length": None,
           "width": None,
           "height": None,
-          "unit": "N/A"
+          "unit": None
         },
         "weight": {
           "value": None,
-          "unit": "N/A"
+          "unit": None
         },
         "material": None,
         "color": None,

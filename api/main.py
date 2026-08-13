@@ -69,6 +69,46 @@ RAW TEXT:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM Extraction failed: {str(e)}")
 
+@app.post("/enrich")
+def enrich_product_data(product: models.Product):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="GEMINI_API_KEY environment variable is not set")
+    
+    prompt = f"""You are validating and enriching a structured product record for an industrial commerce catalog.
+
+Given the product JSON below, check for:
+1. Internal inconsistencies (e.g. a "power_rating" that doesn't match the stated category, a weight implausible for the stated dimensions/material)
+2. Fields that are null but could be reasonably inferred from OTHER fields already present in the record (not from outside knowledge) — if you infer a value, add it to field_confidence with reasoning citing which other field led to the inference
+3. Fields that remain null and cannot be inferred — leave them null, do not guess
+
+For each issue found, add a string to enrichment_flags describing the issue in plain language (e.g. "Weight seems low for stated dimensions and material — verify").
+
+Do not modify high-confidence fields already explicitly stated in the source. Only touch null fields or add flags.
+
+Output ONLY the updated JSON, same schema, no commentary.
+
+PRODUCT JSON:
+{product.model_dump_json(indent=2)}"""
+
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+        )
+        output_text = response.text.strip()
+        if output_text.startswith("```json"):
+            output_text = output_text[7:]
+        if output_text.startswith("```"):
+            output_text = output_text[3:]
+        if output_text.endswith("```"):
+            output_text = output_text[:-3]
+            
+        return json.loads(output_text.strip())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LLM Enrichment failed: {str(e)}")
+
 @app.post("/products", response_model=models.Product, status_code=201)
 def create_product(product: models.ProductCreate, db: Session = Depends(get_db)):
     db_product = db.query(database.DBProduct).filter(database.DBProduct.product_id == product.product_id).first()

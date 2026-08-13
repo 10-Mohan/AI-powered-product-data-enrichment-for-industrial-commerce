@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const extractBtn = document.getElementById('extract-btn');
+    const enrichBtn = document.getElementById('enrich-btn');
     const saveBtn = document.getElementById('save-btn');
     const rawTextInput = document.getElementById('raw-text');
     const jsonOutput = document.getElementById('json-output');
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         extractBtn.textContent = 'Extracting...';
         extractBtn.disabled = true;
         jsonOutput.value = '';
+        enrichBtn.disabled = true;
         saveBtn.disabled = true;
 
         try {
@@ -40,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             jsonOutput.value = JSON.stringify(data, null, 2);
+            enrichBtn.disabled = false;
             saveBtn.disabled = false;
             showStatus('Extraction successful!');
         } catch (error) {
@@ -47,6 +50,46 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             extractBtn.textContent = 'Extract Data';
             extractBtn.disabled = false;
+        }
+    });
+
+    enrichBtn.addEventListener('click', async () => {
+        const jsonStr = jsonOutput.value.trim();
+        if (!jsonStr) return;
+
+        let parsedData;
+        try {
+            parsedData = JSON.parse(jsonStr);
+        } catch (e) {
+            showStatus('Invalid JSON format. Please correct it before enriching.', true);
+            return;
+        }
+
+        enrichBtn.textContent = 'Enriching...';
+        enrichBtn.disabled = true;
+        saveBtn.disabled = true;
+
+        try {
+            const response = await fetch('/enrich', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(parsedData)
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.detail || 'Failed to enrich data');
+            }
+
+            const data = await response.json();
+            jsonOutput.value = JSON.stringify(data, null, 2);
+            showStatus('Enrichment successful!');
+        } catch (error) {
+            showStatus(`Error enriching: ${error.message}`, true);
+        } finally {
+            enrichBtn.textContent = 'Enrich Data';
+            enrichBtn.disabled = false;
+            saveBtn.disabled = false;
         }
     });
 
