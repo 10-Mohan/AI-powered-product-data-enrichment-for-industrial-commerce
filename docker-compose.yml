@@ -2,12 +2,12 @@ version: "3.8"
 services:
   api:
     build:
-      context: ./api
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./api:/app
+      - .:/app
     environment:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
